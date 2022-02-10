@@ -1,0 +1,64 @@
+#include <SFML/Graphics.hpp>
+using namespace sf;
+int main()
+{
+    RenderWindow window(VideoMode(1024, 720), "Snake");
+    RectangleShape shape(Vector2f(20, 20));
+    shape.setFillColor(Color::Green);
+    shape.setOrigin(10, 10);
+    shape.setPosition(100, 100);
+    enum direction { stop, up, down, right, left };
+    direction dir = stop;
+    float x = .25, y = .25;
+
+    while (window.isOpen())
+    {
+        
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::Closed)
+                window.close();
+        }
+        if (shape.getPosition().y <0 || shape.getPosition().x < 0 || shape.getPosition().y>720||shape.getPosition().x>1024)
+        {   
+            shape.setPosition(512,360);
+            dir = stop;
+        }
+        if (Keyboard::isKeyPressed(Keyboard::W))
+        {
+            dir = up;
+        }if (Keyboard::isKeyPressed(Keyboard::A))
+        {
+            dir = left;
+        }if (Keyboard::isKeyPressed(Keyboard::D))
+        {
+            dir = right;
+        }if (Keyboard::isKeyPressed(Keyboard::S))
+        {
+            dir = down;
+        }
+        switch (dir)
+        {
+        case up:
+            shape.move(0, -y);
+            break;
+        case down:
+            shape.move(0, y);
+            break;
+        case right:
+            shape.move(x, 0);
+            break;
+        case left:
+            shape.move(-x, 0);
+            break;
+        default:
+            break;
+        }
+        window.clear();
+        window.draw(shape);
+        window.display();
+    }
+
+    return 0;
+}
