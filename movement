@@ -25,16 +25,16 @@ int main()
             shape.setPosition(512,360);
             dir = stop;
         }
-        if (Keyboard::isKeyPressed(Keyboard::W))
+        if (Keyboard::isKeyPressed(Keyboard::W) && dir != down || Keyboard::isKeyPressed(Keyboard::Up)&&dir!=down)
         {
             dir = up;
-        }if (Keyboard::isKeyPressed(Keyboard::A))
+        }if (Keyboard::isKeyPressed(Keyboard::A) && dir != right||Keyboard::isKeyPressed(Keyboard::Left)&&dir!=right)
         {
             dir = left;
-        }if (Keyboard::isKeyPressed(Keyboard::D))
+        }if (Keyboard::isKeyPressed(Keyboard::D) && dir != left || Keyboard::isKeyPressed(Keyboard::Right)&&dir!=left)
         {
             dir = right;
-        }if (Keyboard::isKeyPressed(Keyboard::S))
+        }if (Keyboard::isKeyPressed(Keyboard::S) && dir != up || Keyboard::isKeyPressed(Keyboard::Down)&&dir!=up)
         {
             dir = down;
         }
