@@ -1,64 +1,127 @@
 #include <SFML/Graphics.hpp>
+
+#include<iostream>
+
+using namespace std;
 using namespace sf;
 int main()
 {
+    int randomx = 0, randomy = 0,counter=0;
+    bool visible = true;
     RenderWindow window(VideoMode(1024, 720), "Snake");
     RectangleShape shape(Vector2f(20, 20));
     shape.setFillColor(Color::Green);
     shape.setOrigin(10, 10);
     shape.setPosition(100, 100);
+    Clock clock,animation_;
+    float deltatime = 0.0;
     enum direction { stop, up, down, right, left };
     direction dir = stop;
-    float x = .25, y = .25;
-
+    const float x = .5, y = .5;
+    srand(time(NULL));
+    randomx = (rand() % 40) * 20;
+    randomy = (rand() % 30) * 20;
+    Texture player,target,back;
+    Sprite mario(player),apple(target),grass(back);
+    player.loadFromFile("./snake.png");
+    target.loadFromFile("./snake.png");
+    back.loadFromFile("./snake.png");
+    mario.setPosition(400, 300);
+    mario.setTextureRect(IntRect(0* 0, 0, 16, 16));
+    mario.setScale(3, 3);
+    apple.setTextureRect(IntRect(32,48,16,16));
+    apple.setScale(2, 2);
+    apple.setPosition(randomx,randomy);
+    grass.setScale(1024,720);
+    Text score;
+    score.setPosition(10,10);
+    
     while (window.isOpen())
     {
-        
+
+
+
         Event event;
         while (window.pollEvent(event))
         {
             if (event.type == Event::Closed)
                 window.close();
         }
-        if (shape.getPosition().y <0 || shape.getPosition().x < 0 || shape.getPosition().y>720||shape.getPosition().x>1024)
-        {   
-            shape.setPosition(512,360);
+        if (mario.getPosition().y < 0 || mario.getPosition().x < 0 || mario.getPosition().y>600 || mario.getPosition().x>800)
+        {
+            mario.setPosition(400, 300);
             dir = stop;
         }
-        if (Keyboard::isKeyPressed(Keyboard::W) && dir != down || Keyboard::isKeyPressed(Keyboard::Up)&&dir!=down)
+        if (Keyboard::isKeyPressed(Keyboard::W) && dir != down || Keyboard::isKeyPressed(Keyboard::Up) && dir != down)
         {
+            mario.setTextureRect(IntRect(0,0,16,16));
             dir = up;
-        }if (Keyboard::isKeyPressed(Keyboard::A) && dir != right||Keyboard::isKeyPressed(Keyboard::Left)&&dir!=right)
+        }if (Keyboard::isKeyPressed(Keyboard::A) && dir != right || Keyboard::isKeyPressed(Keyboard::Left) && dir != right)
         {
+            mario.setTextureRect(IntRect(48, 0, 16, 16));
+            
             dir = left;
-        }if (Keyboard::isKeyPressed(Keyboard::D) && dir != left || Keyboard::isKeyPressed(Keyboard::Right)&&dir!=left)
+        }
+        if (Keyboard::isKeyPressed(Keyboard::D) && dir != left || Keyboard::isKeyPressed(Keyboard::Right) && dir != left)
         {
+            mario.setTextureRect(IntRect(16, 0, 16, 16));
+           
             dir = right;
-        }if (Keyboard::isKeyPressed(Keyboard::S) && dir != up || Keyboard::isKeyPressed(Keyboard::Down)&&dir!=up)
+        }
+        if (Keyboard::isKeyPressed(Keyboard::S) && dir != up || Keyboard::isKeyPressed(Keyboard::Down) && dir != up)
         {
+            mario.setTextureRect(IntRect(32, 0, 16, 16));
             dir = down;
         }
         switch (dir)
         {
         case up:
-            shape.move(0, -y);
+            mario.move(0, -y);
+           
             break;
         case down:
-            shape.move(0, y);
+            mario.move(0, y);
+           
             break;
         case right:
-            shape.move(x, 0);
+            mario.move(x, 0);
+           
             break;
         case left:
-            shape.move(-x, 0);
+            mario.move(-x, 0);
             break;
         default:
             break;
         }
-        window.clear();
-        window.draw(shape);
+        if (mario.getGlobalBounds().intersects(apple.getGlobalBounds()))
+        {
+            counter++;
+            cout << "score :\t"<< counter<<"\n";
+            visible = false;
+        }
+        
+
+        window.clear(Color::Green);
+        window.draw(mario);
+        apple.setPosition(randomx, randomy);
+        if (visible)
+        {
+            window.draw(apple);
+        }
+        if (visible==false)
+        {
+            visible = true;
+            srand(time(NULL));
+            randomx = (rand() % 40) * 20;
+            randomy = (rand() % 30) * 20;
+            apple.setPosition(randomx,randomy);
+            
+        }
+
         window.display();
+        deltatime = clock.restart().asSeconds()*100;
     }
 
-    return 0;
+
+    return 0 ;
 }
