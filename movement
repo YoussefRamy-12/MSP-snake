@@ -1,127 +1,153 @@
-#include <SFML/Graphics.hpp>
 
+#include <SFML/Graphics.hpp>
 #include<iostream>
+#include <SFML/Audio.hpp>
 
 using namespace std;
 using namespace sf;
 int main()
 {
-    int randomx = 0, randomy = 0,counter=0;
+    int randomx = 0, randomy = 0, counter = 0, max = 0, c = 0;
     bool visible = true;
     RenderWindow window(VideoMode(1024, 720), "Snake");
-    RectangleShape shape(Vector2f(20, 20));
-    shape.setFillColor(Color::Green);
-    shape.setOrigin(10, 10);
-    shape.setPosition(100, 100);
-    Clock clock,animation_;
+    CircleShape shape;
+    shape.setFillColor(Color::Red);
+    shape.setRadius(4);
+    shape.setOutlineColor(Color::Black);
+    shape.setOutlineThickness(2);
+    Clock clock, animation_, clock2;
     float deltatime = 0.0;
     enum direction { stop, up, down, right, left };
     direction dir = stop;
-    const float x = .5, y = .5;
+    float x = .5, y = .5;
     srand(time(NULL));
     randomx = (rand() % 40) * 20;
     randomy = (rand() % 30) * 20;
-    Texture player,target,back;
-    Sprite mario(player),apple(target),grass(back);
+    shape.setPosition(randomx, randomy);
+    Texture player, target, back, player2;
+    Sprite snake(player), apple(target), grass(back), tail(player2);
     player.loadFromFile("./snake.png");
     target.loadFromFile("./snake.png");
     back.loadFromFile("./snake.png");
-    mario.setPosition(400, 300);
-    mario.setTextureRect(IntRect(0* 0, 0, 16, 16));
-    mario.setScale(3, 3);
-    apple.setTextureRect(IntRect(32,48,16,16));
+    player2.loadFromFile("./snake.png");
+    tail.setTextureRect(IntRect(0, 16, 16, 16));
+    tail.setScale(1, c);
+    tail.setPosition(400, 316);
+    snake.setPosition(400, 300);
+    snake.setTextureRect(IntRect(0, 0, 16, 16));
+    snake.setScale(3, 3);
+    apple.setTextureRect(IntRect(32, 48, 16, 16));
     apple.setScale(2, 2);
-    apple.setPosition(randomx,randomy);
-    grass.setScale(1024,720);
-    Text score;
-    score.setPosition(10,10);
-    
+    apple.setPosition(randomx, randomy);
+    grass.setScale(64, 45);
+    grass.setTextureRect(IntRect(48, 48, 16, 16));
+    Text score_;
+    Font font;
+    font.loadFromFile("./font.ttf");
+    score_.setFont(font);
+    score_.setFillColor(Color::Blue);
+    score_.setOutlineColor(Color::Black);
+    score_.setOutlineThickness(2);
+    score_.setString("score: " + to_string(counter));
+    score_.setPosition(10, 10);
+    float snakex[1024] = { 0 };
+    float snakey[720] = { 0 };
+    RectangleShape SNAKE;
+    SNAKE.setPosition(Vector2f(snakex[0], snakey[0]));
     while (window.isOpen())
     {
 
 
 
-        Event event;
+        Event event, event2;
         while (window.pollEvent(event))
         {
             if (event.type == Event::Closed)
+            {
                 window.close();
+            }
         }
-        if (mario.getPosition().y < 0 || mario.getPosition().x < 0 || mario.getPosition().y>600 || mario.getPosition().x>800)
+        if (snake.getPosition().y < 0 || snake.getPosition().x < 0 || snake.getPosition().y>720 || snake.getPosition().x>1024)
         {
-            mario.setPosition(400, 300);
+
+            snake.setPosition(512, 360);
             dir = stop;
+            counter = 0;
+            score_.setString("score: " + to_string(counter));
         }
         if (Keyboard::isKeyPressed(Keyboard::W) && dir != down || Keyboard::isKeyPressed(Keyboard::Up) && dir != down)
         {
-            mario.setTextureRect(IntRect(0,0,16,16));
+            snake.setTextureRect(IntRect(0, 0, 16, 16));
             dir = up;
         }if (Keyboard::isKeyPressed(Keyboard::A) && dir != right || Keyboard::isKeyPressed(Keyboard::Left) && dir != right)
         {
-            mario.setTextureRect(IntRect(48, 0, 16, 16));
-            
+            snake.setTextureRect(IntRect(48, 0, 16, 16));
+
             dir = left;
         }
         if (Keyboard::isKeyPressed(Keyboard::D) && dir != left || Keyboard::isKeyPressed(Keyboard::Right) && dir != left)
         {
-            mario.setTextureRect(IntRect(16, 0, 16, 16));
-           
+            snake.setTextureRect(IntRect(16, 0, 16, 16));
+
             dir = right;
         }
         if (Keyboard::isKeyPressed(Keyboard::S) && dir != up || Keyboard::isKeyPressed(Keyboard::Down) && dir != up)
         {
-            mario.setTextureRect(IntRect(32, 0, 16, 16));
+            snake.setTextureRect(IntRect(32, 0, 16, 16));
             dir = down;
         }
         switch (dir)
         {
         case up:
-            mario.move(0, -y);
-           
+            snake.move(0, -y);
+
             break;
         case down:
-            mario.move(0, y);
-           
+            snake.move(0, y);
+
             break;
         case right:
-            mario.move(x, 0);
-           
+            snake.move(x, 0);
+
             break;
         case left:
-            mario.move(-x, 0);
+            snake.move(-x, 0);
             break;
         default:
             break;
         }
-        if (mario.getGlobalBounds().intersects(apple.getGlobalBounds()))
+        if (snake.getGlobalBounds().intersects(apple.getGlobalBounds()))
         {
             counter++;
-            cout << "score :\t"<< counter<<"\n";
+            score_.setString("score: " + to_string(counter));
+            cout << "score :\t" << counter << "\n";
             visible = false;
         }
-        
-
-        window.clear(Color::Green);
-        window.draw(mario);
+        if (max < counter)
+        {
+            max = counter;
+        }
+        window.clear();
+        window.draw(grass);
+        window.draw(snake);
         apple.setPosition(randomx, randomy);
         if (visible)
         {
             window.draw(apple);
         }
-        if (visible==false)
+        if (visible == false)
         {
             visible = true;
             srand(time(NULL));
             randomx = (rand() % 40) * 20;
             randomy = (rand() % 30) * 20;
-            apple.setPosition(randomx,randomy);
-            
+            apple.setPosition(randomy, randomx);
+
         }
 
         window.display();
-        deltatime = clock.restart().asSeconds()*100;
+        deltatime = clock.restart().asSeconds() * 100;
     }
-
-
-    return 0 ;
+    cout << endl << "High Score; " << max;
+    return 0;
 }
